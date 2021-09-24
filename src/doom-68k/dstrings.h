@@ -28,14 +28,7 @@
 
 
 // All important printed strings.
-// Language selection (message strings).
-// Use -DFRENCH etc.
-
-#ifdef FRENCH
-#include "d_french.h"
-#else
 #include "d_englsh.h"
-#endif
 
 // Misc. other strings.
 #define SAVEGAMENAME	"doomsav"
