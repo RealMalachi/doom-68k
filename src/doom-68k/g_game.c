@@ -112,7 +112,6 @@ int starttime; // for comparative timing purposes
 
 doomboolean viewactive;
 
-doomboolean netgame; // only true if packets are broadcast 
 doomboolean playeringame[MAXPLAYERS];
 player_t players[MAXPLAYERS];
 
@@ -125,7 +124,6 @@ int totalkills, totalitems, totalsecret; // for intermission
 char demoname[32];
 doomboolean demorecording;
 doomboolean demoplayback;
-doomboolean netdemo;
 byte* demobuffer;
 byte* demo_p;
 byte* demoend;
@@ -632,18 +630,6 @@ void G_Ticker(void) {
                 std_sprintf(turbomessage, "%s is turbo!", player_names[i]);
                 players[consoleplayer].message = turbomessage;
             }
-
-            if (netgame && !netdemo && !(gametic % ticdup)) {
-                if (gametic > BACKUPTICS
-                        && consistancy[i][buf] != cmd->consistancy) {
-                    I_Error("consistency failure (%i should be %i)",
-                            cmd->consistancy, consistancy[i][buf]);
-                }
-                if (players[i].mo)
-                    consistancy[i][buf] = players[i].mo->x;
-                else
-                    consistancy[i][buf] = rndindex;
-            }
         }
     }
 
@@ -867,34 +853,8 @@ void G_DeathMatchSpawnPlayer(int playernum) {
 // 
 
 void G_DoReborn(int playernum) {
-    int i;
-
-    if (!netgame) {
-        // reload the level from scratch
-        gameaction = ga_loadlevel;
-    } else {
-        // respawn at the start
-
-        // first dissasociate the corpse 
-        players[playernum].mo->player = NULL;
-
-        if (G_CheckSpot(playernum, &playerstarts[playernum])) {
-            P_SpawnPlayer(&playerstarts[playernum]);
-            return;
-        }
-
-        // try to spawn at one of the other players spots 
-        for (i = 0; i < MAXPLAYERS; i++) {
-            if (G_CheckSpot(playernum, &playerstarts[i])) {
-                playerstarts[i].type = playernum + 1; // fake as other player 
-                P_SpawnPlayer(&playerstarts[i]);
-                playerstarts[i].type = i + 1; // restore 
-                return;
-            }
-            // he's going to be inside something.  Too bad.
-        }
-        P_SpawnPlayer(&playerstarts[playernum]);
-    }
+    // reload the level from scratch
+    gameaction = ga_loadlevel;
 }
 
 void G_ScreenShot(void) {
@@ -1243,8 +1203,6 @@ void G_DeferedInitNew(skill_t skill, int episode, int map) {
 
 void G_DoNewGame(void) {
     demoplayback = false;
-    netdemo = false;
-    netgame = false;
     playeringame[1] = playeringame[2] = playeringame[3] = 0;
     respawnparm = false;
     fastparm = false;
@@ -1472,10 +1430,6 @@ void G_DoPlayDemo(void) {
 
     for (i = 0; i < MAXPLAYERS; i++)
         playeringame[i] = *demo_p++;
-    if (playeringame[1]) {
-        netgame = true;
-        netdemo = true;
-    }
 
     // don't spend a lot of time in loadlevel 
     precache = false;
@@ -1525,8 +1479,6 @@ doomboolean G_CheckDemoStatus(void) {
 
         Z_ChangeTag(demobuffer, PU_CACHE);
         demoplayback = false;
-        netdemo = false;
-        netgame = false;
         playeringame[1] = playeringame[2] = playeringame[3] = 0;
         respawnparm = false;
         fastparm = false;

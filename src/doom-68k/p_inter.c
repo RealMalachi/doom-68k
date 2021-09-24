@@ -310,10 +310,7 @@ P_GivePower
 //
 // P_TouchSpecialThing
 //
-void
-P_TouchSpecialThing
-( mobj_t*	special,
-  mobj_t*	toucher )
+void P_TouchSpecialThing(mobj_t* special, mobj_t* toucher)
 {
     player_t*	player;
     int		i;
@@ -397,7 +394,6 @@ P_TouchSpecialThing
 	if (!player->cards[it_bluecard])
 	    player->message = GOTBLUECARD;
 	P_GiveCard (player, it_bluecard);
-	if (!netgame)
 	    break;
 	return;
 	
@@ -405,7 +401,6 @@ P_TouchSpecialThing
 	if (!player->cards[it_yellowcard])
 	    player->message = GOTYELWCARD;
 	P_GiveCard (player, it_yellowcard);
-	if (!netgame)
 	    break;
 	return;
 	
@@ -413,7 +408,6 @@ P_TouchSpecialThing
 	if (!player->cards[it_redcard])
 	    player->message = GOTREDCARD;
 	P_GiveCard (player, it_redcard);
-	if (!netgame)
 	    break;
 	return;
 	
@@ -421,7 +415,6 @@ P_TouchSpecialThing
 	if (!player->cards[it_blueskull])
 	    player->message = GOTBLUESKUL;
 	P_GiveCard (player, it_blueskull);
-	if (!netgame)
 	    break;
 	return;
 	
@@ -429,7 +422,6 @@ P_TouchSpecialThing
 	if (!player->cards[it_yellowskull])
 	    player->message = GOTYELWSKUL;
 	P_GiveCard (player, it_yellowskull);
-	if (!netgame)
 	    break;
 	return;
 	
@@ -437,7 +429,6 @@ P_TouchSpecialThing
 	if (!player->cards[it_redskull])
 	    player->message = GOTREDSKULL;
 	P_GiveCard (player, it_redskull);
-	if (!netgame)
 	    break;
 	return;
 	
@@ -664,7 +655,7 @@ P_KillMobj
 	if (target->player)
 	    source->player->frags[target->player-players]++;
     }
-    else if (!netgame && (target->flags & MF_COUNTKILL) )
+    else if (target->flags & MF_COUNTKILL)
     {
 	// count all monster deaths,
 	// even those caused by other monsters

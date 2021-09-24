@@ -79,9 +79,6 @@ extern  int		gamemap;
 
 // Nightmare mode flag, single player.
 extern  doomboolean         respawnmonsters;
-
-// Netgame? Only true if >1 player.
-extern  doomboolean	netgame;
 	
 // -------------------------
 // Internal parameters for sound rendering.

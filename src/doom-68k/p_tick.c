@@ -129,15 +129,14 @@ void P_RunThinkers (void)
 
 void P_Ticker (void)
 {
-    int		i;
+    int i;
     
     // run the tic
     if (paused)
 	return;
 		
     // pause if in menu and at least one tic has been run
-    if ( !netgame
-	 && menuactive
+    if (menuactive
 	 && !demoplayback
 	 && players[consoleplayer].viewz != 1)
     {

@@ -59,7 +59,6 @@ void I_InitNetwork(void) {
 
     doomcom->ticdup = 1;
     doomcom->extratics = 0;
-    netgame = false;
     doomcom->id = DOOMCOM_ID;
     doomcom->numplayers = doomcom->numnodes = 1;
     doomcom->deathmatch = false;

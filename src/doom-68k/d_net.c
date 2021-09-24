@@ -148,8 +148,7 @@ void HSendPacket(int node, int flags) {
     if (demoplayback)return;
 
 
-    if (!netgame)
-        I_Error("Tried to transmit to another node");
+    I_Error("Tried to transmit to another node");
 
     doomcom->command = CMD_SEND;
     doomcom->remotenode = node;
@@ -191,53 +190,7 @@ doomboolean HGetPacket(void) {
         return true;
     }
 
-    if (!netgame)
-        return false;
-
-    if (demoplayback)
-        return false;
-
-    doomcom->command = CMD_GET;
-    I_NetCmd();
-
-    if (doomcom->remotenode == -1)
-        return false;
-
-    if (doomcom->datalength != NetbufferSize()) {
-        if (debugfile)
-            std_fprintf(debugfile, "bad packet length %i\n", doomcom->datalength);
-        return false;
-    }
-
-    if (NetbufferChecksum() != (netbuffer->checksum & NCMD_CHECKSUM)) {
-        if (debugfile)
-            std_fprintf(debugfile, "bad packet checksum\n");
-        return false;
-    }
-
-    if (debugfile) {
-        int realretrans;
-        int i;
-
-        if (netbuffer->checksum & NCMD_SETUP)
-            std_fprintf(debugfile, "setup packet\n");
-        else {
-            if (netbuffer->checksum & NCMD_RETRANSMIT)
-                realretrans = ExpandTics(netbuffer->retransmitfrom);
-            else
-                realretrans = -1;
-
-            std_fprintf(debugfile, "get %i = (%i + %i, R %i)[%i] ",
-                    doomcom->remotenode,
-                    ExpandTics(netbuffer->starttic),
-                    netbuffer->numtics, realretrans, doomcom->datalength);
-
-            for (i = 0; i < doomcom->datalength; i++)
-                std_fprintf(debugfile, "%i ", ((byte *) netbuffer)[i]);
-            std_fprintf(debugfile, "\n");
-        }
-    }
-    return true;
+    return false;
 }
 
 
@@ -529,9 +482,6 @@ void D_CheckNetGame(void) {
 
     netbuffer = &doomcom->data;
     consoleplayer = displayplayer = doomcom->consoleplayer;
-    if (netgame) {
-        D_ArbitrateNetStart();
-    }
 
     //sys_printf("startskill %i  deathmatch: %i  startmap: %i  startepisode: %i\n",
     //startskill, deathmatch, startmap, startepisode);
@@ -566,20 +516,6 @@ void D_QuitNetGame(void) {
 
     if (debugfile) {
         //fclose(debugfile);
-    }
-
-    if (!netgame || !usergame || consoleplayer == -1 || demoplayback)
-        return;
-
-    // send a bunch of packets for security
-    netbuffer->player = consoleplayer;
-    netbuffer->numtics = 0;
-
-    for (i = 0; i < 4; i++) {
-        for (j = 1; j < doomcom->numnodes; j++)
-            if (nodeingame[j])
-                HSendPacket(j, NCMD_EXIT);
-        I_WaitVBL(1);
     }
 }
 

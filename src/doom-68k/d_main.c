@@ -744,7 +744,7 @@ void D_DoomInit(void) {
 
 
     if (gameaction != ga_loadgame) {
-        if (autostart || netgame)
+        if (autostart)
             G_InitNew(startskill, startepisode, startmap);
         else
             D_StartTitle(); // start up intro loop

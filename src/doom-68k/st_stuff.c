@@ -487,9 +487,6 @@ void ST_refreshBackground(void) {
     if (st_statusbaron) {
         V_DrawPatch(ST_X, 0, BG, sbar);
 
-        if (netgame)
-            V_DrawPatch(ST_FX, 0, BG, faceback);
-
         V_CopyRect(ST_X, 0, BG, ST_WIDTH, ST_HEIGHT, ST_X, ST_Y, FG);
     }
 
@@ -519,115 +516,114 @@ ST_Responder(event_t* ev) {
         }
     }        // if a user keypress...
     else if (ev->type == ev_keydown) {
-        if (!netgame) {
-            // b. - enabled for more debug fun.
-            // if (gameskill != sk_nightmare) {
+        // b. - enabled for more debug fun.
+        // if (gameskill != sk_nightmare) {
 
-            // 'dqd' cheat for toggleable god mode
-            if (cht_CheckCheat(&cheat_god, ev->data1)) {
-                plyr->cheats ^= CF_GODMODE;
-                if (plyr->cheats & CF_GODMODE) {
-                    if (plyr->mo)
-                        plyr->mo->health = 100;
+        // 'dqd' cheat for toggleable god mode
+        if (cht_CheckCheat(&cheat_god, ev->data1)) {
+            plyr->cheats ^= CF_GODMODE;
+            if (plyr->cheats & CF_GODMODE) {
+                if (plyr->mo)
+                    plyr->mo->health = 100;
 
-                    plyr->health = 100;
-                    plyr->message = STSTR_DQDON;
-                } else
-                    plyr->message = STSTR_DQDOFF;
-            }// 'fa' cheat for killer fucking arsenal
-            else if (cht_CheckCheat(&cheat_ammonokey, ev->data1)) {
-                plyr->armorpoints = 200;
-                plyr->armortype = 2;
+                plyr->health = 100;
+                plyr->message = STSTR_DQDON;
+            } else
+                plyr->message = STSTR_DQDOFF;
+        }// 'fa' cheat for killer fucking arsenal
+        else if (cht_CheckCheat(&cheat_ammonokey, ev->data1)) {
+            plyr->armorpoints = 200;
+            plyr->armortype = 2;
 
-                for (i = 0; i < NUMWEAPONS; i++)
-                    plyr->weaponowned[i] = true;
+            for (i = 0; i < NUMWEAPONS; i++)
+                plyr->weaponowned[i] = true;
 
-                for (i = 0; i < NUMAMMO; i++)
-                    plyr->ammo[i] = plyr->maxammo[i];
+            for (i = 0; i < NUMAMMO; i++)
+                plyr->ammo[i] = plyr->maxammo[i];
 
-                plyr->message = STSTR_FAADDED;
-            }// 'kfa' cheat for key full ammo
-            else if (cht_CheckCheat(&cheat_ammo, ev->data1)) {
-                plyr->armorpoints = 200;
-                plyr->armortype = 2;
+            plyr->message = STSTR_FAADDED;
+        }// 'kfa' cheat for key full ammo
+        else if (cht_CheckCheat(&cheat_ammo, ev->data1)) {
+            plyr->armorpoints = 200;
+            plyr->armortype = 2;
 
-                for (i = 0; i < NUMWEAPONS; i++)
-                    plyr->weaponowned[i] = true;
+            for (i = 0; i < NUMWEAPONS; i++)
+                plyr->weaponowned[i] = true;
 
-                for (i = 0; i < NUMAMMO; i++)
-                    plyr->ammo[i] = plyr->maxammo[i];
+            for (i = 0; i < NUMAMMO; i++)
+                plyr->ammo[i] = plyr->maxammo[i];
 
-                for (i = 0; i < NUMCARDS; i++)
-                    plyr->cards[i] = true;
+            for (i = 0; i < NUMCARDS; i++)
+                plyr->cards[i] = true;
 
-                plyr->message = STSTR_KFAADDED;
-            }// 'mus' cheat for changing music
-            else if (cht_CheckCheat(&cheat_mus, ev->data1)) {
+            plyr->message = STSTR_KFAADDED;
+        }// 'mus' cheat for changing music
+        else if (cht_CheckCheat(&cheat_mus, ev->data1)) {
 
-                char buf[3];
-                int musnum;
+            char buf[3];
+            int musnum;
 
-                plyr->message = STSTR_MUS;
-                cht_GetParam(&cheat_mus, buf);
+            plyr->message = STSTR_MUS;
+            cht_GetParam(&cheat_mus, buf);
 
-                if (gamemode == commercial) {
-                    musnum = mus_runnin + (buf[0] - '0')*10 + buf[1] - '0' - 1;
+            if (gamemode == commercial) {
+                musnum = mus_runnin + (buf[0] - '0')*10 + buf[1] - '0' - 1;
 
-                    if (((buf[0] - '0')*10 + buf[1] - '0') > 35)
-                        plyr->message = STSTR_NOMUS;
-                    else
-                        S_ChangeMusic(musnum, 1);
-                } else {
-                    musnum = mus_e1m1 + (buf[0] - '1')*9 + (buf[1] - '1');
-
-                    if (((buf[0] - '1')*9 + buf[1] - '1') > 31)
-                        plyr->message = STSTR_NOMUS;
-                    else
-                        S_ChangeMusic(musnum, 1);
-                }
-            }// Simplified, accepting both "noclip" and "idspispopd".
-                // no clipping mode cheat
-            else if (cht_CheckCheat(&cheat_noclip, ev->data1)
-                    || cht_CheckCheat(&cheat_commercial_noclip, ev->data1)) {
-                plyr->cheats ^= CF_NOCLIP;
-
-                if (plyr->cheats & CF_NOCLIP)
-                    plyr->message = STSTR_NCON;
+                if (((buf[0] - '0')*10 + buf[1] - '0') > 35)
+                    plyr->message = STSTR_NOMUS;
                 else
-                    plyr->message = STSTR_NCOFF;
-            }
-            // 'behold?' power-up cheats
-            for (i = 0; i < 6; i++) {
-                if (cht_CheckCheat(&cheat_powerup[i], ev->data1)) {
-                    if (!plyr->powers[i])
-                        P_GivePower(plyr, i);
-                    else if (i != pw_strength)
-                        plyr->powers[i] = 1;
-                    else
-                        plyr->powers[i] = 0;
+                    S_ChangeMusic(musnum, 1);
+            } else {
+                musnum = mus_e1m1 + (buf[0] - '1')*9 + (buf[1] - '1');
 
-                    plyr->message = STSTR_BEHOLDX;
-                }
+                if (((buf[0] - '1')*9 + buf[1] - '1') > 31)
+                    plyr->message = STSTR_NOMUS;
+                else
+                    S_ChangeMusic(musnum, 1);
             }
+        }// Simplified, accepting both "noclip" and "idspispopd".
+            // no clipping mode cheat
+        else if (cht_CheckCheat(&cheat_noclip, ev->data1)
+                || cht_CheckCheat(&cheat_commercial_noclip, ev->data1)) {
+            plyr->cheats ^= CF_NOCLIP;
 
-            // 'behold' power-up menu
-            if (cht_CheckCheat(&cheat_powerup[6], ev->data1)) {
-                plyr->message = STSTR_BEHOLD;
-            }// 'choppers' invulnerability & chainsaw
-            else if (cht_CheckCheat(&cheat_choppers, ev->data1)) {
-                plyr->weaponowned[wp_chainsaw] = true;
-                plyr->powers[pw_invulnerability] = true;
-                plyr->message = STSTR_CHOPPERS;
-            }// 'mypos' for player position
-            else if (cht_CheckCheat(&cheat_mypos, ev->data1)) {
-                static char buf[ST_MSGWIDTH];
-                std_sprintf(buf, "ang=0x%x;x,y=(0x%x,0x%x)",
-                        players[consoleplayer].mo->angle,
-                        players[consoleplayer].mo->x,
-                        players[consoleplayer].mo->y);
-                plyr->message = buf;
+            if (plyr->cheats & CF_NOCLIP)
+                plyr->message = STSTR_NCON;
+            else
+                plyr->message = STSTR_NCOFF;
+        }
+        // 'behold?' power-up cheats
+        for (i = 0; i < 6; i++) {
+            if (cht_CheckCheat(&cheat_powerup[i], ev->data1)) {
+                if (!plyr->powers[i])
+                    P_GivePower(plyr, i);
+                else if (i != pw_strength)
+                    plyr->powers[i] = 1;
+                else
+                    plyr->powers[i] = 0;
+
+                plyr->message = STSTR_BEHOLDX;
             }
         }
+
+        // 'behold' power-up menu
+        if (cht_CheckCheat(&cheat_powerup[6], ev->data1)) {
+            plyr->message = STSTR_BEHOLD;
+        }// 'choppers' invulnerability & chainsaw
+        else if (cht_CheckCheat(&cheat_choppers, ev->data1)) {
+            plyr->weaponowned[wp_chainsaw] = true;
+            plyr->powers[pw_invulnerability] = true;
+            plyr->message = STSTR_CHOPPERS;
+        }// 'mypos' for player position
+        else if (cht_CheckCheat(&cheat_mypos, ev->data1)) {
+            static char buf[ST_MSGWIDTH];
+            std_sprintf(buf, "ang=0x%x;x,y=(0x%x,0x%x)",
+                    players[consoleplayer].mo->angle,
+                    players[consoleplayer].mo->x,
+                    players[consoleplayer].mo->y);
+            plyr->message = buf;
+        }
+        
 
         // 'clev' change-level cheat
         if (cht_CheckCheat(&cheat_clev, ev->data1)) {
