@@ -65,11 +65,6 @@ extern  doomboolean	modifiedgame;
 
 
 // -------------------------------------------
-// Language.
-extern  Language_t   language;
-
-
-// -------------------------------------------
 // Selected skill type, map etc.
 //
 

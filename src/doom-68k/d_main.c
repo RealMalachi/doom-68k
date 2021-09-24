@@ -521,7 +521,6 @@ void IdentifyVersion(void) {
     char* doomuwad;
     char* doom2wad;
 
-    char* doom2fwad;
     char* plutoniawad;
     char* tntwad;
 
@@ -563,9 +562,6 @@ void IdentifyVersion(void) {
     std_sprintf(tntwad, "%s/tnt.wad", doomwaddir);
 
 
-    // French stuff.
-    doom2fwad = std_malloc(std_strlen(doomwaddir) + 1 + 10 + 1);
-    std_sprintf(doom2fwad, "%s/doom2f.wad", doomwaddir);
     /*
         home = getenv("HOME");
         if (!home)
@@ -611,16 +607,6 @@ void IdentifyVersion(void) {
         std_strcpy(basedefault, DEVDATA"default.cfg");
         return;
     }
-    /*
-        if (!sys_access(doom2fwad, R_OK)) {
-            gamemode = commercial;
-            // C'est ridicule!
-            // Let's handle languages in config files, okay?
-            language = french;
-            sys_printf("French version\n");
-            D_AddFile(doom2fwad);
-            return;
-        }*/
 
     if (!std_access(doom2wad, R_OK)) {
         gamemode = commercial;
