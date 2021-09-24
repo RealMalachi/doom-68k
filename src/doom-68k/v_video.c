@@ -45,7 +45,7 @@ byte* screens[5];
 
 int dirtybox[4];
 
-
+unsigned int global_palette[256];
 
 // Now where did these came from?
 byte gammatable[5][256] = {

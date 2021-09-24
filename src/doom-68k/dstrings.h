@@ -43,8 +43,6 @@
 #define DEVDATA "devdata"
 
 
-// Not done in french?
-
 // QuitDOOM messages
 #define NUM_QUITMESSAGES   22
 

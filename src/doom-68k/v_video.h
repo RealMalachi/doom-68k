@@ -51,7 +51,7 @@ extern  int	dirtybox[4];
 extern	byte	gammatable[5][256];
 extern	int	usegamma;
 
-unsigned int global_palette[256];
+extern	unsigned int global_palette[256];
 
 // Allocates buffer screens, call before R_Init.
 void V_Init (void);
