@@ -169,14 +169,9 @@ void W_AddFile(char *filename) {
 
         // WAD file
         std_read(handle, &header, sizeof (header));
-        if (std_strncmp(header.identification, "IWAD", 4)) {
-            // Homebrew levels?
-            if (std_strncmp(header.identification, "PWAD", 4)) {
-                I_Error("Wad file %s doesn't have IWAD "
-                        "or PWAD id\n", filename);
-            }
-
-            // ???modifiedgame = true;		
+        if (std_strncmp(header.identification, "IWAD", 4))
+        {
+        	I_Error("MDoom only accepts an IWAD");
         }
         header.numlumps = LONG(header.numlumps);
         header.infotableofs = LONG(header.infotableofs);

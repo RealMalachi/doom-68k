@@ -226,11 +226,7 @@ void R_InitSpriteDefs(char** namelist) {
             frame = lumpinfo[l].name[4] - 'A';
             rotation = lumpinfo[l].name[5] - '0';
 
-            if (modifiedgame) {
-                patched = W_GetNumForName(lumpinfo[l].name);
-            } else {
-                patched = l;
-            }
+            patched = l;
 
             R_InstallSpriteLump(patched, frame, rotation, false);
 

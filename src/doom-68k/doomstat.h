@@ -60,9 +60,6 @@ extern  doomboolean	devparm;	// DEBUG: launched with -devparm
 extern GameMode_t	gamemode;
 extern GameMission_t	gamemission;
 
-// Set if homebrew PWAD stuff has been added.
-extern  doomboolean	modifiedgame;
-
 
 // -------------------------------------------
 // Selected skill type, map etc.

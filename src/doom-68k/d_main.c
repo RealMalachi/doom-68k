@@ -663,7 +663,6 @@ void D_DoomInit(void) {
     IdentifyVersion();
 
     //setbuf(stdout, NULL);
-    modifiedgame = false;
 
 
     switch (gamemode) {
