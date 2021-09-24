@@ -112,7 +112,6 @@ int starttime; // for comparative timing purposes
 
 doomboolean viewactive;
 
-doomboolean deathmatch; // only if started as net death 
 doomboolean netgame; // only true if packets are broadcast 
 doomboolean playeringame[MAXPLAYERS];
 player_t players[MAXPLAYERS];
@@ -475,7 +474,7 @@ void G_DoLoadLevel(void) {
 doomboolean G_Responder(event_t* ev) {
     // allow spy mode changes even during the demo
     if (gamestate == GS_LEVEL && ev->type == ev_keydown
-            && ev->data1 == KEY_F12 && (singledemo || !deathmatch)) {
+            && ev->data1 == KEY_F12) {
         // spy mode 
         do {
             displayplayer++;
@@ -879,12 +878,6 @@ void G_DoReborn(int playernum) {
         // first dissasociate the corpse 
         players[playernum].mo->player = NULL;
 
-        // spawn at random spot if in death match 
-        if (deathmatch) {
-            G_DeathMatchSpawnPlayer(playernum);
-            return;
-        }
-
         if (G_CheckSpot(playernum, &playerstarts[playernum])) {
             P_SpawnPlayer(&playerstarts[playernum]);
             return;
@@ -1174,10 +1167,7 @@ void G_DoLoadGame(void) {
 // Description is a 24 byte text string 
 //
 
-void
-G_SaveGame
-(int slot,
-        char* description) {
+void G_SaveGame(int slot, char *description) {
     savegameslot = slot;
     std_strcpy(savedescription, description);
     sendsave = true;
@@ -1244,11 +1234,7 @@ skill_t d_skill;
 int d_episode;
 int d_map;
 
-void
-G_DeferedInitNew
-(skill_t skill,
-        int episode,
-        int map) {
+void G_DeferedInitNew(skill_t skill, int episode, int map) {
     d_skill = skill;
     d_episode = episode;
     d_map = map;
@@ -1259,7 +1245,6 @@ void G_DoNewGame(void) {
     demoplayback = false;
     netdemo = false;
     netgame = false;
-    deathmatch = false;
     playeringame[1] = playeringame[2] = playeringame[3] = 0;
     respawnparm = false;
     fastparm = false;
@@ -1272,11 +1257,7 @@ void G_DoNewGame(void) {
 // The sky texture to be used instead of the F_SKY1 dummy.
 extern int skytexture;
 
-void
-G_InitNew
-(skill_t skill,
-        int episode,
-        int map) {
+void G_InitNew(skill_t skill, int episode, int map) {
     int i;
 
     if (paused) {
@@ -1446,7 +1427,7 @@ void G_BeginRecording(void) {
     *demo_p++ = gameskill;
     *demo_p++ = gameepisode;
     *demo_p++ = gamemap;
-    *demo_p++ = deathmatch;
+    *demo_p++ = false;
     *demo_p++ = respawnparm;
     *demo_p++ = fastparm;
     *demo_p++ = nomonsters;
@@ -1483,7 +1464,7 @@ void G_DoPlayDemo(void) {
     skill = *demo_p++;
     episode = *demo_p++;
     map = *demo_p++;
-    deathmatch = *demo_p++;
+    *demo_p++; // deathmatch
     respawnparm = *demo_p++;
     fastparm = *demo_p++;
     nomonsters = *demo_p++;
@@ -1546,7 +1527,6 @@ doomboolean G_CheckDemoStatus(void) {
         demoplayback = false;
         netdemo = false;
         netgame = false;
-        deathmatch = false;
         playeringame[1] = playeringame[2] = playeringame[3] = 0;
         respawnparm = false;
         fastparm = false;

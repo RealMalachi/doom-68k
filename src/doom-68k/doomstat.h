@@ -82,10 +82,6 @@ extern  doomboolean         respawnmonsters;
 
 // Netgame? Only true if >1 player.
 extern  doomboolean	netgame;
-
-// Flag: true only if started as net deathmatch.
-// An enum might handle altdeath/cooperative better.
-extern  doomboolean	deathmatch;	
 	
 // -------------------------
 // Internal parameters for sound rendering.

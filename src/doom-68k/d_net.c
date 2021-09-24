@@ -462,7 +462,6 @@ void D_ArbitrateNetStart(void) {
                 if (netbuffer->player != VERSION)
                     I_Error("Different DOOM versions cannot play a net game!");
                 startskill = netbuffer->retransmitfrom & 15;
-                deathmatch = (netbuffer->retransmitfrom & 0xc0) >> 6;
                 nomonsters = (netbuffer->retransmitfrom & 0x20) > 0;
                 respawnparm = (netbuffer->retransmitfrom & 0x10) > 0;
                 startmap = netbuffer->starttic & 0x3f;
@@ -477,8 +476,6 @@ void D_ArbitrateNetStart(void) {
             CheckAbort();
             for (i = 0; i < doomcom->numnodes; i++) {
                 netbuffer->retransmitfrom = startskill;
-                if (deathmatch)
-                    netbuffer->retransmitfrom |= (deathmatch << 6);
                 if (nomonsters)
                     netbuffer->retransmitfrom |= 0x20;
                 if (respawnparm)

@@ -631,16 +631,6 @@ P_SetupLevel
     deathmatch_p = deathmatchstarts;
     P_LoadThings(lumpnum + ML_THINGS);
 
-    // if deathmatch, randomly spawn the active players
-    if (deathmatch) {
-        for (i = 0; i < MAXPLAYERS; i++)
-            if (playeringame[i]) {
-                players[i].mo = NULL;
-                G_DeathMatchSpawnPlayer(i);
-            }
-
-    }
-
     // clear special respawning que
     iquehead = iquetail = 0;
 

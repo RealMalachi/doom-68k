@@ -164,36 +164,11 @@ P_GiveAmmo
 // P_GiveWeapon
 // The weapon name may have a MF_DROPPED flag ored in.
 //
-doomboolean
-P_GiveWeapon
-( player_t*	player,
-  weapontype_t	weapon,
-  doomboolean	dropped )
+doomboolean P_GiveWeapon(player_t* player,
+	weapontype_t weapon, doomboolean dropped)
 {
     doomboolean	gaveammo;
     doomboolean	gaveweapon;
-	
-    if (netgame
-	&& (deathmatch!=2)
-	 && !dropped )
-    {
-	// leave placed weapons forever on net games
-	if (player->weaponowned[weapon])
-	    return false;
-
-	player->bonuscount += BONUSADD;
-	player->weaponowned[weapon] = true;
-
-	if (deathmatch)
-	    P_GiveAmmo (player, weaponinfo[weapon].ammo, 5);
-	else
-	    P_GiveAmmo (player, weaponinfo[weapon].ammo, 2);
-	player->pendingweapon = weapon;
-
-	if (player == &players[consoleplayer])
-	    S_StartSound (NULL, sfx_wpnup);
-	return false;
-    }
 	
     if (weaponinfo[weapon].ammo != am_noammo)
     {
