@@ -158,11 +158,6 @@ void D_PostEvent(event_t* ev) {
 void D_ProcessEvents(void) {
     event_t* ev;
 
-    // IF STORE DEMO, DO NOT ACCEPT INPUT
-    if ((gamemode == commercial)
-            && (W_CheckNumForName("map01") < 0))
-        return;
-
     for (; eventtail != eventhead; eventtail = (++eventtail)&(MAXEVENTS - 1)) {
 
         ev = &events[eventtail];
@@ -416,23 +411,14 @@ void D_DoAdvanceDemo(void) {
     paused = false;
     gameaction = ga_nothing;
 
-    if (gamemode == retail)
-        demosequence = (demosequence + 1) % 7;
-    else
-        demosequence = (demosequence + 1) % 6;
+    demosequence = (demosequence + 1) % 6;
 
     switch (demosequence) {
         case 0:
-            if (gamemode == commercial)
-                pagetic = 35 * 11;
-            else
-                pagetic = 170;
+            pagetic = 170;
             gamestate = GS_DEMOSCREEN;
             pagename = "TITLEPIC";
-            if (gamemode == commercial)
-                S_StartMusic(mus_dm2ttl);
-            else
-                S_StartMusic(mus_intro);
+            S_StartMusic(mus_intro);
             break;
         case 1:
             G_DeferedPlayDemo("demo1");
@@ -447,18 +433,8 @@ void D_DoAdvanceDemo(void) {
             break;
         case 4:
             gamestate = GS_DEMOSCREEN;
-            if (gamemode == commercial) {
-                pagetic = 35 * 11;
-                pagename = "TITLEPIC";
-                S_StartMusic(mus_dm2ttl);
-            } else {
-                pagetic = 200;
-
-                if (gamemode == retail)
-                    pagename = "CREDIT";
-                else
-                    pagename = "HELP2";
-            }
+            pagetic = 200;
+            pagename = "HELP2";
             break;
         case 5:
             G_DeferedPlayDemo("demo3");
@@ -516,13 +492,7 @@ void D_AddFile(char *file) {
 
 void IdentifyVersion(void) {
 
-    char* doom1wad;
-    char* doomwad;
-    char* doomuwad;
-    char* doom2wad;
-
-    char* plutoniawad;
-    char* tntwad;
+    char *doomwad;
 
     char *doomwaddir = ".";
 
@@ -537,29 +507,9 @@ void IdentifyVersion(void) {
     if (!doomwaddir)
         doomwaddir = ".";*/
 
-    // Commercial.
-    doom2wad = std_malloc(std_strlen(doomwaddir) + 1 + 9 + 1);
-    std_sprintf(doom2wad, "%s/doom2.wad", doomwaddir);
-
-    // Retail.
-    doomuwad = std_malloc(std_strlen(doomwaddir) + 1 + 8 + 1);
-    std_sprintf(doomuwad, "%s/doomu.wad", doomwaddir);
-
     // Registered.
     doomwad = std_malloc(std_strlen(doomwaddir) + 1 + 8 + 1);
     std_sprintf(doomwad, "%s/doom.wad", doomwaddir);
-
-    // Shareware.
-    doom1wad = std_malloc(std_strlen(doomwaddir) + 1 + 9 + 1);
-    std_sprintf(doom1wad, "%s/doom1.wad", doomwaddir);
-
-    // Bug, dear Shawn.
-    // Insufficient malloc, caused spurious realloc errors.
-    plutoniawad = std_malloc(std_strlen(doomwaddir) + 1 + /*9*/12 + 1);
-    std_sprintf(plutoniawad, "%s/plutonia.wad", doomwaddir);
-
-    tntwad = std_malloc(std_strlen(doomwaddir) + 1 + 9 + 1);
-    std_sprintf(tntwad, "%s/tnt.wad", doomwaddir);
 
 
     /*
@@ -570,82 +520,12 @@ void IdentifyVersion(void) {
      */
     std_sprintf(basedefault, "%s", ".");
 
-    if (M_CheckParm("-shdev")) {
-        gamemode = shareware;
-        devparm = true;
-        D_AddFile(DEVDATA"doom1.wad");
-        D_AddFile(DEVMAPS"data_se/texture1.lmp");
-        D_AddFile(DEVMAPS"data_se/pnames.lmp");
-        std_strcpy(basedefault, DEVDATA"default.cfg");
-        return;
-    }
-
-    if (M_CheckParm("-regdev")) {
-        gamemode = registered;
-        devparm = true;
-        D_AddFile(DEVDATA"doom.wad");
-        D_AddFile(DEVMAPS"data_se/texture1.lmp");
-        D_AddFile(DEVMAPS"data_se/texture2.lmp");
-        D_AddFile(DEVMAPS"data_se/pnames.lmp");
-        std_strcpy(basedefault, DEVDATA"default.cfg");
-        return;
-    }
-
-    if (M_CheckParm("-comdev")) {
-        gamemode = commercial;
-        devparm = true;
-        /* I don't bother
-        if(plutonia)
-            D_AddFile (DEVDATA"plutonia.wad");
-        else if(tnt)
-            D_AddFile (DEVDATA"tnt.wad");
-        else*/
-        D_AddFile(DEVDATA"doom2.wad");
-
-        D_AddFile(DEVMAPS"cdata/texture1.lmp");
-        D_AddFile(DEVMAPS"cdata/pnames.lmp");
-        std_strcpy(basedefault, DEVDATA"default.cfg");
-        return;
-    }
-
-    if (!std_access(doom2wad, R_OK)) {
-        gamemode = commercial;
-        D_AddFile(doom2wad);
-        return;
-    }
-
-    if (!std_access(plutoniawad, R_OK)) {
-        gamemode = commercial;
-        D_AddFile(plutoniawad);
-        return;
-    }
-
-    if (!std_access(tntwad, R_OK)) {
-        gamemode = commercial;
-        D_AddFile(tntwad);
-        return;
-    }
-
-    if (!std_access(doomuwad, R_OK)) {
-        gamemode = retail;
-        D_AddFile(doomuwad);
-        return;
-    }
-
     if (!std_access(doomwad, R_OK)) {
-        gamemode = registered;
         D_AddFile(doomwad);
         return;
     }
 
-    if (!std_access(doom1wad, R_OK)) {
-        gamemode = shareware;
-        D_AddFile(doom1wad);
-        return;
-    }
-
     std_printf("Game mode indeterminate.\n");
-    gamemode = indetermined;
 }
 
 //
@@ -664,34 +544,9 @@ void D_DoomInit(void) {
 
     //setbuf(stdout, NULL);
 
-
-    switch (gamemode) {
-        case retail:
-            std_sprintf(title,
-                    "The Ultimate DOOM Startup v%i.%i",
-                    VERSION / 100, VERSION % 100);
-            break;
-        case shareware:
-            std_sprintf(title,
-                    "DOOM Shareware Startup v%i.%i",
-                    VERSION / 100, VERSION % 100);
-            break;
-        case registered:
-            std_sprintf(title,
-                    "DOOM Registered Startup v%i.%i",
-                    VERSION / 100, VERSION % 100);
-            break;
-        case commercial:
-            std_sprintf(title,
-                    "DOOM 2: Hell on Earth v%i.%i",
-                    VERSION / 100, VERSION % 100);
-            break;
-        default:
-            std_sprintf(title,
-                    "Public DOOM - v%i.%i",
-                    VERSION / 100, VERSION % 100);
-            break;
-    }
+    std_sprintf(title,
+            "DOOM Registered Startup v%i.%i",
+            VERSION / 100, VERSION % 100);
 
     std_printf("%s\n", title);
 

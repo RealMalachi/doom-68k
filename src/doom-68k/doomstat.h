@@ -53,14 +53,6 @@ extern  doomboolean	fastparm;	// checkparm of -fast
 extern  doomboolean	devparm;	// DEBUG: launched with -devparm
 
 
-
-// -----------------------------------------------------
-// Game Mode - identify IWAD as shareware, retail etc.
-//
-extern GameMode_t	gamemode;
-extern GameMission_t	gamemission;
-
-
 // -------------------------------------------
 // Selected skill type, map etc.
 //

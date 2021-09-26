@@ -108,15 +108,6 @@ void P_InitSwitchList(void) {
     
     int i;
     int index;
-    int episode;
-
-    episode = 1;
-
-    if (gamemode == registered)
-        episode = 2;
-    else
-        if (gamemode == commercial)
-        episode = 3;
 
     for (index = 0, i = 0; i < MAXSWITCHES; i++) {
         if (!alphSwitchList[i].episode) {
@@ -125,7 +116,7 @@ void P_InitSwitchList(void) {
             break;
         }
 
-        if (alphSwitchList[i].episode <= episode) {
+        if (alphSwitchList[i].episode <= 2) {
 #if 0	// UNUSED - debug?
             int value;
 

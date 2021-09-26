@@ -422,19 +422,6 @@ void G_DoLoadLevel(void) {
     //  setting one.
     skyflatnum = R_FlatNumForName(SKYFLATNAME);
 
-    // DOOM determines the sky texture to be used
-    // depending on the current episode, and the game version.
-    if ((gamemode == commercial)
-            || (gamemode == pack_tnt)
-            || (gamemode == pack_plut)) {
-        skytexture = R_TextureNumForName("SKY3");
-        if (gamemap < 12)
-            skytexture = R_TextureNumForName("SKY1");
-        else
-            if (gamemap < 21)
-            skytexture = R_TextureNumForName("SKY2");
-    }
-
     levelstarttic = gametic; // for time calculation
 
     if (wipegamestate == GS_LEVEL)
@@ -886,24 +873,20 @@ int cpars[32] = {
 doomboolean secretexit;
 extern char* pagename;
 
-void G_ExitLevel(void) {
+void G_ExitLevel(void)
+{
     secretexit = false;
     gameaction = ga_completed;
 }
 
-// Here's for the german edition.
-
-void G_SecretExitLevel(void) {
-    // IF NO WOLF3D LEVELS, NO SECRET EXIT!
-    if ((gamemode == commercial)
-            && (W_CheckNumForName("map31") < 0))
-        secretexit = false;
-    else
-        secretexit = true;
+void G_SecretExitLevel(void)
+{
+    secretexit = true;
     gameaction = ga_completed;
 }
 
-void G_DoCompleted(void) {
+void G_DoCompleted(void)
+{
     int i;
 
     gameaction = ga_nothing;
@@ -915,84 +898,52 @@ void G_DoCompleted(void) {
     if (automapactive)
         AM_Stop();
 
-    if (gamemode != commercial)
-        switch (gamemap) {
-            case 8:
-                gameaction = ga_victory;
-                return;
-            case 9:
-                for (i = 0; i < MAXPLAYERS; i++)
-                    players[i].didsecret = true;
-                break;
-        }
-
-    //#if 0  Hmmm - why?
-    if ((gamemap == 8)
-            && (gamemode != commercial)) {
-        // victory 
-        gameaction = ga_victory;
-        return;
+    switch (gamemap)
+	{
+        case 8:
+            gameaction = ga_victory;
+            return;
+        case 9:
+            for (i = 0; i < MAXPLAYERS; i++)
+                players[i].didsecret = true;
+            break;
     }
-
-    if ((gamemap == 9)
-            && (gamemode != commercial)) {
-        // exit secret level 
-        for (i = 0; i < MAXPLAYERS; i++)
-            players[i].didsecret = true;
-    }
-    //#endif
-
 
     wminfo.didsecret = players[consoleplayer].didsecret;
     wminfo.epsd = gameepisode - 1;
     wminfo.last = gamemap - 1;
 
     // wminfo.next is 0 biased, unlike gamemap
-    if (gamemode == commercial) {
-        if (secretexit)
-            switch (gamemap) {
-                case 15: wminfo.next = 30;
-                    break;
-                case 31: wminfo.next = 31;
-                    break;
-            } else
-            switch (gamemap) {
-                case 31:
-                case 32: wminfo.next = 15;
-                    break;
-                default: wminfo.next = gamemap;
-            }
-    } else {
-        if (secretexit)
-            wminfo.next = 8; // go to secret level 
-        else if (gamemap == 9) {
-            // returning from secret level 
-            switch (gameepisode) {
-                case 1:
-                    wminfo.next = 3;
-                    break;
-                case 2:
-                    wminfo.next = 5;
-                    break;
-                case 3:
-                    wminfo.next = 6;
-                    break;
-                case 4:
-                    wminfo.next = 2;
-                    break;
-            }
-        } else
-            wminfo.next = gamemap; // go to next level 
+    
+    if (secretexit)
+        wminfo.next = 8; // go to secret level 
+    else if (gamemap == 9)
+    {
+        // returning from secret level 
+        switch (gameepisode) {
+            case 1:
+                wminfo.next = 3;
+                break;
+            case 2:
+                wminfo.next = 5;
+                break;
+            case 3:
+                wminfo.next = 6;
+                break;
+            case 4:
+                wminfo.next = 2;
+                break;
+        }
     }
+	else
+        wminfo.next = gamemap; // go to next level 
+    
 
     wminfo.maxkills = totalkills;
     wminfo.maxitems = totalitems;
     wminfo.maxsecret = totalsecret;
     wminfo.maxfrags = 0;
-    if (gamemode == commercial)
-        wminfo.partime = 35 * cpars[gamemap - 1];
-    else
-        wminfo.partime = 35 * pars[gameepisode][gamemap];
+    wminfo.partime = 35 * pars[gameepisode][gamemap];
     wminfo.pnum = consoleplayer;
 
     for (i = 0; i < MAXPLAYERS; i++) {
@@ -1025,21 +976,6 @@ void G_WorldDone(void) {
 
     if (secretexit)
         players[consoleplayer].didsecret = true;
-
-    if (gamemode == commercial) {
-        switch (gamemap) {
-            case 15:
-            case 31:
-                if (!secretexit)
-                    break;
-            case 6:
-            case 11:
-            case 20:
-            case 30:
-                F_StartFinale();
-                break;
-        }
-    }
 }
 
 void G_DoWorldDone(void) {
@@ -1218,40 +1154,25 @@ extern int skytexture;
 void G_InitNew(skill_t skill, int episode, int map) {
     int i;
 
-    if (paused) {
+    if (paused)
+    {
         paused = false;
         S_ResumeSound();
     }
 
-
     if (skill > sk_nightmare)
         skill = sk_nightmare;
 
-
-    // This was quite messy with SPECIAL and commented parts.
-    // Supposedly hacks to make the latest edition work.
-    // It might not work properly.
     if (episode < 1)
         episode = 1;
 
-    if (gamemode == retail) {
-        if (episode > 4)
-            episode = 4;
-    } else if (gamemode == shareware) {
-        if (episode > 1)
-            episode = 1; // only start episode 1 on shareware
-    } else {
-        if (episode > 3)
-            episode = 3;
-    }
-
-
+    if (episode > 3)
+    	episode = 3;
 
     if (map < 1)
         map = 1;
 
-    if ((map > 9)
-            && (gamemode != commercial))
+    if (map > 9)
         map = 9;
 
     M_ClearRandom();
@@ -1292,28 +1213,18 @@ void G_InitNew(skill_t skill, int episode, int map) {
     viewactive = true;
 
     // set the sky map for the episode
-    if (gamemode == commercial) {
-        skytexture = R_TextureNumForName("SKY3");
-        if (gamemap < 12)
+    switch (episode)
+	{
+        case 1:
             skytexture = R_TextureNumForName("SKY1");
-        else
-            if (gamemap < 21)
+            break;
+        case 2:
             skytexture = R_TextureNumForName("SKY2");
-    } else
-        switch (episode) {
-            case 1:
-                skytexture = R_TextureNumForName("SKY1");
-                break;
-            case 2:
-                skytexture = R_TextureNumForName("SKY2");
-                break;
-            case 3:
-                skytexture = R_TextureNumForName("SKY3");
-                break;
-            case 4: // Special Edition sky
-                skytexture = R_TextureNumForName("SKY4");
-                break;
-        }
+            break;
+        case 3:
+            skytexture = R_TextureNumForName("SKY3");
+            break;
+    }
 
     G_DoLoadLevel();
 }

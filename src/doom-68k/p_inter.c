@@ -379,14 +379,7 @@ void P_TouchSpecialThing(mobj_t* special, mobj_t* toucher)
 	break;
 	
       case SPR_MEGA:
-	if (gamemode != commercial)
-	    return;
-	player->health = 200;
-	player->mo->health = player->health;
-	P_GiveArmor (player,2);
-	player->message = GOTMSPHERE;
-	sound = sfx_getpow;
-	break;
+	return;
 	
 	// cards
 	// leave cards for everyone
