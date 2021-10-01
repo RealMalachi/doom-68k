@@ -1,1 +1,0 @@
-E:\projects\MEGA-ED-PRO\_tools\megalink\megalink\bin\Release\megalink.exe ..\mapper\doom\output_files\mapper.rbf doom-ed.md
